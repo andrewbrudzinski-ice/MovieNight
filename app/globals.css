@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Font stacks — system fonts so there's no build-time font fetch. */
+  --font-inter: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-ink-950 text-slate-100 antialiased;
+    background-image:
+      radial-gradient(60rem 40rem at 15% -10%, rgba(139, 92, 246, 0.16), transparent 60%),
+      radial-gradient(50rem 40rem at 100% 0%, rgba(255, 200, 87, 0.1), transparent 55%),
+      radial-gradient(60rem 50rem at 50% 120%, rgba(139, 92, 246, 0.12), transparent 60%);
+    background-attachment: fixed;
+    min-height: 100dvh;
+  }
+
+  /* Visible, on-brand focus ring for keyboard users. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-popcorn ring-offset-2 ring-offset-ink-950;
+  }
+
+  ::selection {
+    background: rgba(255, 200, 87, 0.3);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-popcorn
+      px-6 py-3 font-semibold text-ink-950 shadow-glow-amber transition
+      hover:bg-popcorn-light active:scale-[0.98]
+      disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border
+      border-white/15 bg-white/5 px-5 py-3 font-medium text-slate-100
+      transition hover:border-white/30 hover:bg-white/10 active:scale-[0.98]
+      disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .card {
+    @apply rounded-3xl border border-white/10 bg-ink-850/80 shadow-card
+      backdrop-blur-sm;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-white/10
+      bg-white/5 px-3 py-1 text-xs font-medium text-slate-300;
+  }
+}
+
+/* Skeleton shimmer used by loading states. */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.06),
+    transparent
+  );
+  animation: shimmer 1.6s infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
