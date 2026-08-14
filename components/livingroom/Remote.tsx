@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { playClick } from "@/lib/sound";
 import { cn } from "@/lib/utils";
 
 function ShuffleIcon({ className = "" }: { className?: string }) {
@@ -45,6 +46,7 @@ export default function Remote({
 
   const press = () => {
     if (busy) return;
+    playClick();
     setPressed(true);
     setTimeout(() => setPressed(false), 200);
     onPick();
@@ -130,7 +132,10 @@ export default function Remote({
       {/* Surprise shortcut key */}
       <button
         type="button"
-        onClick={onSurprise}
+        onClick={() => {
+          playClick();
+          onSurprise();
+        }}
         disabled={busy}
         aria-label="Surprise me"
         className={cn(

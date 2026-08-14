@@ -1,8 +1,74 @@
 "use client";
 
 import Remote from "@/components/livingroom/Remote";
+import SoundToggle from "@/components/livingroom/SoundToggle";
 import TvScreen, { type ScreenStatus } from "@/components/livingroom/TvScreen";
 import type { MovieWithStreaming } from "@/types/movie";
+
+/** A leafy potted plant for the corner (SVG, dark and understated). */
+function Plant() {
+  return (
+    <div
+      className="pointer-events-none absolute bottom-[16%] left-3 hidden md:block lg:left-6"
+      aria-hidden
+    >
+      <svg width="86" height="104" viewBox="0 0 86 104" className="mx-auto">
+        <defs>
+          <linearGradient id="leaf" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#2c4a34" />
+            <stop offset="1" stopColor="#14261b" />
+          </linearGradient>
+        </defs>
+        <g fill="url(#leaf)" stroke="#0f1d14" strokeWidth="1">
+          {[-42, -22, 0, 22, 42].map((deg, i) => (
+            <path
+              key={i}
+              d="M43 96 C 33 70, 33 36, 43 10 C 53 36, 53 70, 43 96 Z"
+              transform={`rotate(${deg} 43 96)`}
+              opacity={0.8}
+            />
+          ))}
+        </g>
+      </svg>
+      {/* pot */}
+      <div
+        className="mx-auto -mt-3 h-9 w-14"
+        style={{
+          clipPath: "polygon(14% 0,86% 0,76% 100%,24% 100%)",
+          background: "linear-gradient(180deg,#5b4636,#33261d)",
+          boxShadow: "inset 0 2px 0 rgba(255,255,255,0.08)",
+        }}
+      />
+    </div>
+  );
+}
+
+/** A warm floor lamp — the source of the room's amber glow. */
+function FloorLamp() {
+  return (
+    <div
+      className="pointer-events-none absolute bottom-[15%] right-2 hidden md:block lg:right-6"
+      aria-hidden
+    >
+      {/* glow from the shade */}
+      <span className="absolute -left-12 -top-8 h-44 w-44 rounded-full bg-amber-300/[0.18] blur-[55px]" />
+      {/* shade */}
+      <div
+        className="relative mx-auto h-11 w-16"
+        style={{
+          clipPath: "polygon(20% 0,80% 0,100% 100%,0 100%)",
+          background: "linear-gradient(180deg,#6a5230,#41341d)",
+          boxShadow:
+            "inset 0 -8px 12px rgba(255,205,130,0.45), 0 6px 24px rgba(255,190,110,0.25)",
+        }}
+      />
+      <span className="mx-auto block h-1 w-16 bg-amber-200/50 blur-[2px]" />
+      {/* pole + base */}
+      <div className="mx-auto h-40 w-1 bg-gradient-to-b from-[#3a3a42] to-[#191920]" />
+      <div className="mx-auto h-1.5 w-12 rounded-[50%] bg-black/60 blur-[1px]" />
+    </div>
+  );
+}
 
 /**
  * The living-room set, drawn with layered CSS for a realistic (not cartoonish)
@@ -57,9 +123,9 @@ export default function LivingRoomScene({
         }}
         aria-hidden
       />
-      {/* warm lamp glow, upper-right */}
+      {/* faint ambient warmth (kept for small screens without the lamp) */}
       <span
-        className="pointer-events-none absolute -right-16 -top-10 h-64 w-64 rounded-full bg-amber-300/10 blur-[60px]"
+        className="pointer-events-none absolute -right-16 -top-10 h-64 w-64 rounded-full bg-amber-300/[0.06] blur-[60px] md:hidden"
         aria-hidden
       />
       {/* corner vignette */}
@@ -71,6 +137,15 @@ export default function LivingRoomScene({
         }}
         aria-hidden
       />
+
+      {/* decorative room props (larger screens have room at the sides) */}
+      <Plant />
+      <FloorLamp />
+
+      {/* sound toggle */}
+      <div className="absolute right-3 top-3 z-30">
+        <SoundToggle />
+      </div>
 
       <div className="relative px-4 pb-0 pt-10 sm:px-10 sm:pt-14">
         {/* ---- TV ---- */}
@@ -162,9 +237,18 @@ export default function LivingRoomScene({
             className="relative mx-auto h-60 max-w-md sm:h-64"
             style={{ perspective: "900px" }}
           >
-            {/* rug */}
+            {/* rug — a soft oval on the floor with a faint inner border */}
             <span
-              className="pointer-events-none absolute bottom-8 left-1/2 h-28 w-[88%] -translate-x-1/2 rounded-[50%] bg-neon/[0.06] blur-2xl"
+              className="pointer-events-none absolute bottom-7 left-1/2 h-24 w-[92%] -translate-x-1/2 rounded-[50%]"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, rgba(139,92,246,0.12), rgba(139,92,246,0.04) 58%, transparent 76%)",
+                boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.04)",
+              }}
+              aria-hidden
+            />
+            <span
+              className="pointer-events-none absolute bottom-[2.4rem] left-1/2 h-14 w-[72%] -translate-x-1/2 rounded-[50%] border border-white/[0.05]"
               aria-hidden
             />
             {/* table shadow on floor */}
