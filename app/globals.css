@@ -84,6 +84,94 @@
   }
 }
 
+/* ---- Living room scene ---- */
+
+/* CRT-ish power-on / flicker while channel surfing. */
+@keyframes tv-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  6% {
+    opacity: 0.72;
+  }
+  12% {
+    opacity: 1;
+  }
+  46% {
+    opacity: 0.9;
+  }
+  55% {
+    opacity: 1;
+  }
+}
+.tv-flicker {
+  animation: tv-flicker 0.9s steps(1, end) infinite;
+}
+
+/* The title/plate popping up on screen — a springy overshoot. */
+@keyframes tv-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.9);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.tv-pop {
+  animation: tv-pop 0.55s cubic-bezier(0.22, 1.2, 0.36, 1) both;
+}
+
+/* Faint moving scanlines over the screen for a TV feel. */
+.tv-scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.04) 0px,
+    rgba(255, 255, 255, 0.04) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+}
+
+/* Remote button press feedback. */
+@keyframes remote-press {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2px);
+  }
+}
+.remote-press {
+  animation: remote-press 0.18s ease-out;
+}
+
+/* Gentle nudge on the idle hint pointing at the remote. */
+@keyframes nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+}
+.animate-nudge {
+  animation: nudge 1.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
