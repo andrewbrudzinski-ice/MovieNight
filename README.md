@@ -80,6 +80,47 @@ npm run typecheck   # tsc --noEmit
 npm run lint        # next lint
 ```
 
+## Deploy
+
+Movie Night is a standard Next.js App Router app, so any Next-compatible host
+works. **Vercel** is the smoothest path.
+
+### Vercel
+
+Next.js is zero-config on Vercel — no `vercel.json` is required. The build
+(`next build`), output, and serverless functions for the API routes are all
+detected automatically.
+
+1. Push this repo to GitHub (already done).
+2. In Vercel, **New Project → Import** this repository.
+3. Add one Environment Variable (Project → Settings → Environment Variables):
+   - `TMDB_API_KEY` = your TMDB key (set it for Production, Preview, and
+     Development)
+   - optionally `NEXT_PUBLIC_DEFAULT_COUNTRY` = `US`
+4. Deploy. That's it.
+
+> Set `TMDB_API_KEY` in Vercel's dashboard, **not** in a committed file. It
+> stays a server-side secret and is never shipped to the browser.
+
+Because the app talks to TMDB from **outbound** server requests (not inbound),
+Vercel's default network access is all it needs — nothing to allowlist there.
+
+### Running in a Claude Code web/cloud session (egress allowlist)
+
+Sandboxed environments (like Claude Code on the web) restrict **outbound**
+network access to an allowlist. TMDB is not on the default list, so live picks
+fail there until you add these hosts to the environment's **network egress**
+settings:
+
+- `api.themoviedb.org` — movie data & streaming availability
+- `image.tmdb.org` — posters, backdrops, and provider logos
+
+Local machines and normal cloud hosts (Vercel, etc.) have open egress, so this
+step only applies to locked-down/sandboxed environments. The symptom when a host
+is blocked is a `403 Host not in allowlist: api.themoviedb.org` from the egress
+proxy, surfaced in the app as a friendly "couldn't reach the movie service"
+message.
+
 ## How it's structured
 
 ```
