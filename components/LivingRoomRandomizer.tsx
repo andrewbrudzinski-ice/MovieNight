@@ -1,11 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import FilterPanel from "@/components/FilterPanel";
 import LivingRoomScene from "@/components/livingroom/LivingRoomScene";
-import StreamingProviders from "@/components/StreamingProviders";
-import WatchlistButton from "@/components/WatchlistButton";
 import type { ScreenStatus } from "@/components/livingroom/TvScreen";
 import { track } from "@/lib/analytics";
 import { getRecent, pushRecent } from "@/lib/history";
@@ -45,7 +43,6 @@ export default function LivingRoomRandomizer() {
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
   const [reel, setReel] = useState<string[]>([]);
   const [showSurprise, setShowSurprise] = useState(false);
-  const detailsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetch("/api/movies/reel")
@@ -104,12 +101,6 @@ export default function LivingRoomRandomizer() {
     [filters],
   );
 
-  useEffect(() => {
-    if (status === "result" && detailsRef.current) {
-      detailsRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-  }, [status, movie]);
-
   const pick = () => {
     const next = { ...filters, surprise: null };
     setFilters(next);
@@ -157,66 +148,7 @@ export default function LivingRoomRandomizer() {
         </div>
       )}
 
-      {/* Now Playing — details + streaming + actions */}
-      {status === "result" && movie && (
-        <section
-          ref={detailsRef}
-          className="card mx-auto max-w-2xl scroll-mt-20 animate-fade-in-up p-5 sm:p-7"
-        >
-          <div className="mb-4 flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-popcorn">
-                Now Playing
-              </p>
-              <h2 className="mt-1 text-xl font-extrabold sm:text-2xl">
-                {movie.title}{" "}
-                {movie.year && (
-                  <span className="font-medium text-slate-400">
-                    ({movie.year})
-                  </span>
-                )}
-              </h2>
-            </div>
-            <WatchlistButton movie={movie} variant="icon" />
-          </div>
-
-          {movie.genres.length > 0 && (
-            <div className="mb-4 flex flex-wrap gap-2">
-              {movie.genres.map((g) => (
-                <span key={g.id} className="chip">
-                  {g.name}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {movie.overview && (
-            <p className="mb-6 leading-relaxed text-slate-300">
-              {movie.overview}
-            </p>
-          )}
-
-          <div className="border-t border-white/10 pt-5">
-            <StreamingProviders
-              availability={movie.streaming}
-              unavailable={movie.streamingUnavailable}
-            />
-          </div>
-
-          <div className="mt-6 flex flex-col gap-3 border-t border-white/10 pt-5 sm:flex-row">
-            <button
-              type="button"
-              onClick={pick}
-              disabled={busy}
-              className="btn-primary flex-1"
-            >
-              <span aria-hidden>🎲</span>
-              {busy ? "Picking…" : "Pick another"}
-            </button>
-            <WatchlistButton movie={movie} />
-          </div>
-        </section>
-      )}
+      {/* The movie lives entirely on the TV — no duplicate card here. */}
 
       {/* Preferences */}
       <section className="mx-auto max-w-2xl">
