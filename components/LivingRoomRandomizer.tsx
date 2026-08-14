@@ -7,6 +7,7 @@ import LivingRoomScene from "@/components/livingroom/LivingRoomScene";
 import type { ScreenStatus } from "@/components/livingroom/TvScreen";
 import { track } from "@/lib/analytics";
 import { getRecent, pushRecent } from "@/lib/history";
+import { playReveal } from "@/lib/sound";
 import type {
   MovieFilters,
   MovieWithStreaming,
@@ -93,6 +94,7 @@ export default function LivingRoomRandomizer() {
         pushRecent(data.movie.id);
         setMovie(data.movie);
         setStatus("result");
+        playReveal();
       } catch {
         setErrorMessage("Network hiccup — couldn't reach the movie service.");
         setStatus("error");
