@@ -36,16 +36,12 @@ export const metadata: Metadata = {
     title: "Movie Night — Stop Scrolling. Start Watching.",
     description: SITE_DESCRIPTION,
   },
-  icons: {
-    icon: [
-      {
-        url:
-          "data:image/svg+xml," +
-          encodeURIComponent(
-            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="82" font-size="82">🍿</text></svg>',
-          ),
-      },
-    ],
+  // Favicon + Apple touch icon come from app/icon.png and app/apple-icon.png;
+  // Android home-screen icons come from app/manifest.ts. Next wires all three.
+  appleWebApp: {
+    capable: true,
+    title: "Movie Night",
+    statusBarStyle: "black-translucent",
   },
 };
 
