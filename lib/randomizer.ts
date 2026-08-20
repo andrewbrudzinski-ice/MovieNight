@@ -157,12 +157,15 @@ function randomInt(maxExclusive: number): number {
  * Weighted pick that gently favors better-rated / more-popular titles so users
  * don't get garbage, while keeping enough entropy to stay fun.
  */
+/**
+ * Near-uniform sampling with only a *gentle* tilt toward better-rated movies.
+ * The pool has already cleared the quality floor (votes, rating filter, usable
+ * metadata), so we deliberately do NOT weight by popularity — that used to make
+ * a handful of blockbusters win almost every time, which is what made picks
+ * feel repetitive. A mild rating tilt keeps quality without killing variety.
+ */
 function weightedPick(pool: Movie[]): Movie {
-  const weights = pool.map((m) => {
-    const ratingBoost = Math.max(0.5, m.rating); // 0.5–10
-    const popBoost = 1 + Math.log10(1 + m.popularity); // dampened
-    return ratingBoost * popBoost;
-  });
+  const weights = pool.map((m) => Math.max(1, m.rating - 3)); // ~1–7, soft tilt
   const total = weights.reduce((a, b) => a + b, 0);
   let r = Math.random() * total;
   for (let i = 0; i < pool.length; i++) {
@@ -170,6 +173,20 @@ function weightedPick(pool: Movie[]): Movie {
     if (r <= 0) return pool[i];
   }
   return pool[pool.length - 1];
+}
+
+// Sort orders rotated for default (non-Surprise) picks so the same titles don't
+// land on the same pages every time. vote_average.desc is intentionally left
+// out here (it returns the same "top rated" list); Surprise modes set their own.
+const DEFAULT_SORTS = [
+  "popularity.desc",
+  "vote_count.desc",
+  "primary_release_date.desc",
+  "popularity.desc", // slightly favor popularity overall
+];
+
+function randomSort(): string {
+  return DEFAULT_SORTS[randomInt(DEFAULT_SORTS.length)];
 }
 
 export interface PickResult {
@@ -195,15 +212,23 @@ export async function pickMovie(
 ): Promise<PickResult> {
   const params = filtersToDiscoverParams(filters);
 
+  // Rotate the sort order for default picks (Surprise modes keep their own),
+  // so the same movies don't sit on the same pages every time.
+  if (!filters.surprise) {
+    params.sortBy = randomSort();
+  }
+
   const firstPage = await discoverMovies({ ...params, page: 1 }, { signal });
 
   if (firstPage.totalResults === 0) {
     return { movie: null, poolSize: 0, reason: "empty" };
   }
 
-  // Cap the page window: TMDB caps discover at 500 pages, and the further pages
-  // hold increasingly obscure titles. Keep the fun-but-good balance.
-  const maxPage = Math.min(firstPage.totalPages, 15);
+  // Sample from a much wider window than before. Every title in the discover
+  // results already meets the vote-count floor, so deeper pages are still
+  // recognizable movies — not garbage — but give far more variety. (TMDB caps
+  // discover at 500 pages.)
+  const maxPage = Math.min(firstPage.totalPages, 50);
   const targetPage = maxPage <= 1 ? 1 : 1 + randomInt(maxPage);
 
   let page = firstPage;
