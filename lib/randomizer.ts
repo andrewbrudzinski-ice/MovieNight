@@ -154,6 +154,16 @@ function randomInt(maxExclusive: number): number {
 }
 
 /**
+ * Pick a page in [1, maxPage] skewed toward the front. `bias` = 1 is uniform;
+ * larger values lean harder toward the earlier (more popular) pages while still
+ * reaching the deep tail sometimes.
+ */
+function biasedPage(maxPage: number, bias: number): number {
+  if (maxPage <= 1) return 1;
+  return 1 + Math.floor(maxPage * Math.pow(Math.random(), bias));
+}
+
+/**
  * Weighted pick that gently favors better-rated / more-popular titles so users
  * don't get garbage, while keeping enough entropy to stay fun.
  */
@@ -229,7 +239,12 @@ export async function pickMovie(
   // recognizable movies — not garbage — but give far more variety. (TMDB caps
   // discover at 500 pages.)
   const maxPage = Math.min(firstPage.totalPages, 50);
-  const targetPage = maxPage <= 1 ? 1 : 1 + randomInt(maxPage);
+  // Skew page selection toward the earlier (more popular) pages so popular
+  // movies come up more often — but not the near-guaranteed way they used to.
+  // Exponent > 1 biases low; ~1.8 leans mainstream while keeping a real long
+  // tail. Within a page the pick stays near-uniform, so no single blockbuster
+  // dominates.
+  const targetPage = biasedPage(maxPage, 1.8);
 
   let page = firstPage;
   if (targetPage !== 1) {
